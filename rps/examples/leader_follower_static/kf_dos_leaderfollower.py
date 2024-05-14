@@ -8,7 +8,7 @@ from rps.utilities.controllers import *
 import numpy as np
 import time
 
-###
+### Communication Graph
 def create_custom_graph(num_robots, topology):
     # Create a custom communication graph based on the desired topology
     # Input: num_robots - number of robots in the system
@@ -71,8 +71,49 @@ L = create_custom_graph(N, 'custom')
 # L[1,1] = L[1,1] + 1
 # L[1,0] = -1
 
+### Kalman Filter-based Consensus Controller:
+def kalman_filter_consensus(x, L):
+    # Implement the Kalman filter equations to estimate each robot's state
+    # Modify the existing consensus controller to incorporate the Kalman filter estimates
+    # Choose appropriate controller gain matrices to ensure stability and convergence
+    # Input: x - state of the robots
+    #        L - Laplacian matrix
+    # Output: dxi - velocity vector
+    # Note: This function should return the velocity vector dxi
+    #       The velocity vector dxi should be a numpy array of shape (2, N)
+    #       The velocity vector dxi should be computed based on the Kalman filter-based consensus controller
+    #       The velocity vector dxi should ensure that the robots reach consensus
+    #       The velocity vector dxi should ensure that the robots avoid collisions
+    #       The velocity vector dxi should ensure that the robots move to the waypoints
+    #       The velocity vector dxi should ensure that the leader moves to the next waypoint when close enough
+    #       The velocity vector dxi should ensure that the robots' velocities are limited to a maximum value
+    #       The velocity vector dxi should ensure that the robots' formation is maintained
+    #       The velocity vector dxi should ensure that the robots' formation is robust to DoS attacks
+
+    # Initialize the state vector
+    xi = x[:2, :] # number 2 is for x and y coordinates
+    # Initialize the state estimate vector
+    xi_hat = np.zeros_like(xi)
+    # Initialize the state covariance matrix
+    P = np.eye(2)
+    # Initialize the process noise covariance matrix
+    Q = np.eye(2)
+    # Initialize the measurement noise covariance matrix
+    R = np.eye(2)
+    # Initialize the Kalman gain matrix
+    K = np.eye(2)
+    # Initialize the control input vector
+    u = np.zeros_like(xi)
+    # Initialize the velocity vector
+    dxi = np.zeros_like(x)
+    return dxi
+###
+# Integrate the Kalman filter-based consensus controller with the existing code
+# dxi = kalman_filter_consensus(x, L)
+###
+
 # For computational/memory reasons, initialize the velocity vector
-dxi = np.zeros((2, N))
+# dxi = np.zeros((2, N))
 
 # Initialize leader state
 state = 0
@@ -118,8 +159,10 @@ for t in range(iterations):
     x = r.get_poses()
     xi = uni_to_si_states(x)
 
-    # Initialize velocity vector
-    dxi = np.zeros((2, N))
+    # # Initialize velocity vector
+    # dxi = np.zeros((2, N))
+    # Integrate the Kalman filter-based consensus controller
+    dxi = kalman_filter_consensus(x, L)
 
     # Followers
     for i in follower_indices:
